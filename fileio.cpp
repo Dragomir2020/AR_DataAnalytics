@@ -1,87 +1,94 @@
 //fileio.cpp
 
-#include <ostream>
+#include <iostream>
+#include <cstdlib>
 #include <map>
 #include <vector>
 #include <string>
 #include <fstream>
-#include "device.h"
-#include "app.h"
 
 
 
 //device: app priority timestamp data....
-void build_device_dict(ifstream& reader, ostream& os);
+//void build_device_dict(ifstream& reader, ostream& os);
 
 
 //app: device_name priority timestamp data....
-void write_app_i_txt(ifstream& reader, ostream& os);
+//void write_app_i_txt(ifstream& reader, ostream& os);
+
+using namespace std;
 
 
+void write_app_i_txt(ifstream& reader, ostream& ost, int i);
 
 struct data 
 {
-  std::string timestamp, num_cores, cpu_req, cpu_percent, cpu_mega_hertz, mem_provisioned, mem_usage, disk_read_through, disk_write_through;
-  std::string network_rec_through, network_trans_through;
+  string timestamp, num_cores, cpu_req, cpu_percent, cpu_mega_hertz, mem_provisioned, mem_usage, disk_read_through, disk_write_through;
+  string network_rec_through, network_trans_through;
 
   void print_data()
   {
-    std::cout << timestamp << " " << num_cores << " " << cpu_req  << " " << cpu_percent << " " << cpu_mega_hertz << " " << mem_provisioned;
-    std::cout << mem_usage << " " << disk_read_through << " " << disk_write_through  << " " << network_rec_through   << " ";
-    std::cout << network_trans_through << "\n";
+    cout << timestamp << " " << num_cores << " " << cpu_req  << " " << cpu_percent << " " << cpu_mega_hertz << " " << mem_provisioned;
+    cout << mem_usage << " " << disk_read_through << " " << disk_write_through  << " " << network_rec_through   << " ";
+    cout << network_trans_through << "\n";
   }
 
 };
 
 struct device
 {
-  std::string device_name, environment, location, os, os_end_date;
+  string device_name, environment, location, os, os_end_date;
   data* device_data;
+
+  device(string device_name, string environment, string location, string os, string os_end_date) : device_name(device_name), environment(environment), location(location), os(os), os_end_date(os_end_date){}
 
   void print_device()
   {
-    std::cout << device_name << " " << environment << " " << location  << " " << os << " " << os_end_date << " " ;
+    cout << device_name << " " << environment << " " << location  << " " << os << " " << os_end_date << " " ;
   }
 };
 
 struct app 
 {
-  std::string app_name, business, priority;  
-  std::vector<device*> devices_for_app;;
+  string app_name, business, priority;  
+  vector<device*> device_entries;;
   int entry_count = 0;
 
   void print_app()
   {
-    std::cout << app_name << " " << business << " " << priority  << " ";
+    cout << app_name << " " << business << " " << priority  << " ";
   }
 
 };
 
 
-std::map<device*> device_vec;
-std::vector<app*> app_vec;
+//map<device*> device_vec;
+vector<app*> app_vec;
 
 
 int main(int argc, char ** argv)
 {
-  string prefix = "app_";
+  string prefix = "/csvfiles/app_";
   string csv = ".csv";
   string file_name = "";
+  string num = "";
 
-  int num_files = argv[1]; // 100
+  int num_files = atoi(argv[1]); // 100
 
   ifstream reader;
-
+  filebuf fb;
 
   for (int i = 0; i < num_files; ++i)
     {
-      file_name = prefix + itoa(i);
-      ostream ost;
-
-      reader.open(file_name + csv);
+      num = to_string(i);
+      file_name = prefix + num;
+      fb.open(/textfiles/file_name + ".txt" , ios::out);
+      ostream ost(&fb);
+      file_name += csv;
+      reader.open(file_name, ifstream::in);
       
       //write to app_i.tx
-      write_app_i_txt(reader, ost, filename);
+      write_app_i_txt(reader, ost, i);
 
       reader.close();
     }
@@ -106,7 +113,7 @@ void write_app_i_txt(ifstream& reader, ostream& ost, int i)
   while(getline(reader, device_name, ','))
     {
       app* cur_app = new app;
-      app_vec.push_pack(cur_app);
+      app_vec.push_back(cur_app);
  
       //read device inf
       getline(reader, device_name, ',');
@@ -119,13 +126,13 @@ void write_app_i_txt(ifstream& reader, ostream& ost, int i)
       
       //read app info
       getline(reader, cur_app->app_name, ',');
-      getline(reader, cur_app->business ',');
+      getline(reader, cur_app->business, ',');
       getline(reader, cur_app->priority, ',');
  
-      data* d_ptr = cur_app->device_entries[cur_app.entry_count]->device_data;
+      data* d_ptr = cur_app->device_entries[cur_app->entry_count]->device_data;
 
       //read data
-      getline(reader, d_ptr->num_cpus, ',');
+      getline(reader, d_ptr->num_cores, ',');
       getline(reader, d_ptr->cpu_req, ',');
       getline(reader, d_ptr->cpu_mega_hertz, ',');
       getline(reader, d_ptr->cpu_percent, ',');
@@ -137,10 +144,10 @@ void write_app_i_txt(ifstream& reader, ostream& ost, int i)
       getline(reader, d_ptr->network_rec_through, ',');
       getline(reader, d_ptr->network_trans_through);
 
-      cur_app.print_app();
-      cur_app.device_entries[cur_app.entry_count].print_device();
+      cur_app->print_app();
+      cur_app->device_entries[cur_app->entry_count]->print_device();
       d_ptr->print_data();
-      ++cur_app.entry_count;
+      ++cur_app->entry_count;
      
     }
   
