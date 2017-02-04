@@ -52,7 +52,7 @@ struct app
 
   void print_app()
   {
-    std::cout << app_name << " " << environment << " " << location  << " " << os << " " ;
+    std::cout << app_name << " " << business << " " << priority  << " ";
   }
 
 };
