@@ -1,0 +1,8 @@
+time ./a.out 14
+
+real    0m22.700s
+user    0m7.900s
+sys     0m9.592s
+
+for 14 csv files we can parse one file in 22.700/14 = 1.62 seconds per file.
+
